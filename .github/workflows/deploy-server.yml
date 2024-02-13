@@ -1,0 +1,24 @@
+# This is a action to deploy
+# COPYRIGHT 2021 Items Api Project
+
+name: Api Items Deploy Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+    deploy:
+      runs-on: [ubuntu, golang, self-hosted]
+      steps:
+        - name: Checkout repo code
+          uses: actions/checkout@v2
+
+        - name: Deploy docker-compose to server
+          uses: matiasnu/github-action-ssh-docker-compose@v2.0.3
+          with:
+            ssh_host: ${{ secrets.SERVER_SSH_HOST }}
+            ssh_user: ${{ secrets.SERVER_SSH_USERNAME }}
+            ssh_private_key: ${{ secrets.SERVER_SSH_PRIVATE_KEY}}
+            ssh_port: ${{ secrets.SERVER_SSH_PORT}}
+            docker_compose_prefix: api_items_project
+            docker_compose_filename: environment/docker-compose.yml

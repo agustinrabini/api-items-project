@@ -1,0 +1,21 @@
+version: '2.1'
+
+services:
+    api-items-project:
+      container_name: api-items-project
+      image: agustinrabini/api-items-project
+      restart: always
+      volumes:
+        - /log/api_items_project:/log
+      env_file:
+        - /routetosecretenvs/apis-items-secrets.env
+      environment:
+        GO_ENVIRONMENT: 'production'
+      ports:
+        - "8009:8080"
+      networks:
+      - "projectnet"
+
+networks:
+  projectnet:
+    external: true

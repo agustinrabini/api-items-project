@@ -1,0 +1,11 @@
+# Folders
+internal/log
+vendor/
+
+# Files
+coverage.out
+.env
+
+# IDE'S
+.vscode/
+.idea/

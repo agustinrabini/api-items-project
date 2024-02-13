@@ -1,0 +1,48 @@
+name: Api Items Projects
+
+on:
+  # push:
+  #   branches: [ master ]
+  #   paths-ignore:
+  #     - '**/README.md'
+  workflow_dispatch:
+  pull_request:
+    branches: [ master, development ]
+    paths-ignore:
+      - '**/README.md'
+      - '**/*.yml'
+
+env:
+  DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+  DOCKER_HUB_PASS: ${{ secrets.DOCKER_HUB_PASS }}
+  GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+  GOPRIVATE: github.com/agustinrabini/go-toolkit
+  VERSION: "latest"
+
+jobs:
+  build:
+    runs-on: [ubuntu, golang, self-hosted]
+    steps:
+      - name: Clean Workspace
+        uses: AutoModality/action-clean@v1
+
+      - name: Checkout repo code
+        uses: actions/checkout@v3
+
+      - name: Config Private Repositories
+        run: git config --global url.https://$GH_ACCESS_TOKEN@github.com/.insteadOf https://github.com/
+
+      - name: Generate vendor folder
+        run: go mod vendor
+
+      - name: Build and Tag Docker Image
+        run: docker build -t agustinrabini/api-items-project:$VERSION -f environment/api-items-project.dockerfile .
+
+  push:
+    needs: build
+    runs-on: [ubuntu, golang, self-hosted]
+    steps:
+      - name: Login to DockerHub
+        run: docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+      - name: Push image to DockerHub
+        run: docker image push agustinrabini/api-items-project:$VERSION
